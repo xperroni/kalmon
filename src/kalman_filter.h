@@ -6,16 +6,11 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class KalmanFilter {
-public:
-
-  // state vector
-  VectorXd x_;
-
-  // state covariance matrix
-  MatrixXd P_;
-
   // state transistion matrix
   MatrixXd F_;
+
+  // state transition matrix (transposed)
+  MatrixXd Ft_;
 
   // process covariance matrix
   MatrixXd Q_;
@@ -23,18 +18,18 @@ public:
   // measurement matrix
   MatrixXd H_;
 
+  // measurement matrix (transposed)
+  MatrixXd Ht_;
+
   // measurement covariance matrix
   MatrixXd R_;
 
-  /**
-   * Constructor
-   */
-  KalmanFilter();
+public:
+  // state vector
+  VectorXd x;
 
-  /**
-   * Destructor
-   */
-  virtual ~KalmanFilter();
+  // state covariance matrix
+  MatrixXd P;
 
   /**
    * Init Initializes Kalman filter
@@ -61,12 +56,17 @@ public:
    */
   void Update(const VectorXd &z);
 
-  /**
-   * @param z The measurement at k+1
-   * @param z_pred The predicted measurements at k+1
-   */
-  void UpdateWithAlreadyPredictedMeasurements(const VectorXd &z, const VectorXd &z_pred);
+  inline void setF(MatrixXd F)
+  {
+    F_ = F;
+    Ft_ = F.transpose();
+  }
 
+  inline void setH(MatrixXd H)
+  {
+    H_ = H;
+    Ht_ = H.transpose();
+  }
 };
 
 #endif /* KALMAN_FILTER_H_ */
