@@ -6,6 +6,12 @@ using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
 class KalmanFilter {
+  // Process noise variance across the X axis.
+  double noise_ax_;
+
+  // Process noise variance across the Y axis.
+  double noise_ay_;
+
   // state transistion matrix
   MatrixXd F_;
 
@@ -32,6 +38,11 @@ public:
   MatrixXd P;
 
   /**
+   * @brief Create a new Kalman Filter with given variance settings.
+   */
+  KalmanFilter(double noise_ax, double noise_ay);
+
+  /**
    * Init Initializes Kalman filter
    * @param x_in Initial state
    * @param P_in Initial state covariance
@@ -46,21 +57,15 @@ public:
   /**
    * Prediction Predicts the state and the state covariance
    * using the process model
-   * @param delta_T Time between k and k+1 in s
+   * @param dt Time between k and k+1 in s
    */
-  void Predict();
+  void Predict(double dt);
 
   /**
    * Updates the state and
    * @param z The measurement at k+1
    */
   void Update(const VectorXd &z);
-
-  inline void setF(MatrixXd F)
-  {
-    F_ = F;
-    Ft_ = F.transpose();
-  }
 
   inline void setH(MatrixXd H)
   {

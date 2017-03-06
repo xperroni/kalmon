@@ -38,45 +38,39 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    *  Initialization
    ****************************************************************************/
   if (!is_initialized_) {
-    /**
-    TODO:
-      * Initialize the state ekf_.x with the first measurement.
-      * Create the covariance matrix.
-      * Remember: you'll need to convert radar from polar to cartesian coordinates.
-    */
-    // first measurement
-    cout << "EKF: " << endl;
-    ekf_.x = VectorXd(4);
-    ekf_.x << 1, 1, 1, 1;
-
+    double p_x = 0;
+    double p_y = 0;
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
     }
     else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-      /**
-      Initialize state.
-      */
+      p_x = measurement_pack.raw_measurements_[0];
+      p_x = measurement_pack.raw_measurements_[0];
     }
+
+    // Initialize the state ekf_.x with the first measurement.
+    ekf_.x << p_x, p_y, 0, 0;
+
+    // Initialize timestamp.
+    previous_timestamp_ = measurement_pack.timestamp_;
 
     // done initializing, no need to predict or update
     is_initialized_ = true;
     return;
   }
 
+  // Compute elapsed time in seconds.
+  double timestamp = measurement_pack.timestamp_;
+  double dt = (timestamp - previous_timestamp_) / 1000000.0;
+
   /*****************************************************************************
    *  Prediction
    ****************************************************************************/
 
-  /**
-   TODO:
-     * Update the state transition matrix F according to the new elapsed time.
-      - Time is measured in seconds.
-     * Update the process noise covariance matrix.
-   */
-
-  ekf_.Predict();
+  // Predict new state.
+  ekf_.Predict(dt);
 
   /*****************************************************************************
    *  Update
@@ -97,4 +91,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   // print the output
   cout << "x = " << ekf_.x << endl;
   cout << "P = " << ekf_.P << endl;
+
+  // Update timestamp.
+  previous_timestamp_ = timestamp;
 }
