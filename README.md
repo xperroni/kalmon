@@ -1,13 +1,15 @@
-# Extended Kalman Filter Project Starter Code
-Self-Driving Car Engineer Nanodegree Program
+# Keep Kalman / Carry On (KalmOn)
+
+Keep Kalman / Carry On (KalmOn) is a C++ implementation of 2D sensor fusion and Kalman filtering. It is provided as a library, along with a demonstration application.
 
 ---
 
 ## Dependencies
 
-* cmake >= v3.5
-* make >= v4.1
-* gcc/g++ >= v5.4
+* cmake >= v2.8
+* make >= v3.81
+* gcc/g++ >= v4.8.4
+* Eigen >= v3.2
 
 ## Basic Build Instructions
 
