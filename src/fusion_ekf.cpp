@@ -11,7 +11,9 @@ using std::vector;
 /*
  * Constructor.
  */
-FusionEKF::FusionEKF() {
+FusionEKF::FusionEKF():
+  ekf_(0, 0)
+{
   is_initialized_ = false;
 
   previous_timestamp_ = 0;
@@ -38,20 +40,22 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    *  Initialization
    ****************************************************************************/
   if (!is_initialized_) {
-    double p_x = 0;
-    double p_y = 0;
-    if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
-      /**
-      Convert radar from polar to cartesian coordinates and initialize state.
-      */
-    }
-    else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
-      p_x = measurement_pack.raw_measurements_[0];
-      p_x = measurement_pack.raw_measurements_[0];
-    }
-
     // Initialize the state ekf_.x with the first measurement.
-    ekf_.x << p_x, p_y, 0, 0;
+    if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
+      double d = measurement_pack.raw_measurements_[0];
+      double r = measurement_pack.raw_measurements_[1];
+      double v = measurement_pack.raw_measurements_[2];
+
+      double cos_r = cos(r);
+      double sin_r = sin(r);
+
+      ekf_.x << (d * cos_r), (d * sin_r), (v * cos_r), (v * sin_r);
+    }
+    else /* if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) */ {
+      double p_x = measurement_pack.raw_measurements_[0];
+      double p_y = measurement_pack.raw_measurements_[1];
+      ekf_.x << p_x, p_y, 0, 0;
+    }
 
     // Initialize timestamp.
     previous_timestamp_ = measurement_pack.timestamp_;
