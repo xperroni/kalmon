@@ -11,27 +11,18 @@
 using namespace std;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
-using std::vector;
 
 void check_arguments(int argc, char* argv[]) {
-  string usage_instructions = "Usage instructions: ";
-  usage_instructions += argv[0];
-  usage_instructions += " path/to/input.txt output.txt";
-
-  bool has_valid_args = false;
-
-  // make sure the user has provided input and output files
-  if (argc == 1) {
-    cerr << usage_instructions << endl;
-  } else if (argc == 2) {
-    cerr << "Please include an output file.\n" << usage_instructions << endl;
-  } else if (argc == 3) {
-    has_valid_args = true;
-  } else if (argc > 3) {
-    cerr << "Too many arguments.\n" << usage_instructions << endl;
+  // Make sure user has provided input and output files.
+  if (argc == 2) {
+    cerr << "Please include an output file." << endl;
+  }
+  else if (argc > 3) {
+    cerr << "Too many arguments." << endl;
   }
 
-  if (!has_valid_args) {
+  if (argc != 3) {
+    cerr << "Usage instructions: " << argv[0] << " path/to/input.txt output.txt" << endl;
     exit(EXIT_FAILURE);
   }
 }
@@ -49,49 +40,49 @@ void check_files(ifstream& in_file, string& in_name,
   }
 }
 
-int main(int argc, char* argv[]) {
+template<class T> void open(T &file, const char *path) {
+  file.open(path);
+  if (!file.is_open()) {
+    cerr << "Cannot open file \"" << path << '"' << endl;
+    exit(EXIT_FAILURE);
+  }
+}
 
+int main(int argc, char* argv[]) {
+  // Confirm arguments are correct, quits otherwise.
   check_arguments(argc, argv);
 
-  string in_file_name_ = argv[1];
-  ifstream in_file(in_file_name_.c_str(), ifstream::in);
+  ifstream in_file;
+  open(in_file, argv[1]);
 
-  string out_file_name_ = argv[2];
-  ofstream out_file(out_file_name_.c_str(), ofstream::out);
-
-  check_files(in_file, in_file_name_, out_file, out_file_name_);
+  ofstream out_file;
+  open(out_file, argv[2]);
 
   vector<MeasurementPackage> measurement_pack_list;
   vector<GroundTruthPackage> gt_pack_list;
 
-  string line;
-
   // prep the measurement packages (each line represents a measurement at a
   // timestamp)
-  while (getline(in_file, line)) {
-
-    string sensor_type;
+  while (!in_file.eof()) {
     MeasurementPackage meas_package;
-    istringstream iss(line);
     long timestamp;
 
     // reads first element from the current line
-    iss >> sensor_type;
+    string sensor_type;
+    in_file >> sensor_type;
     if (sensor_type.compare("L") == 0) {
       // LASER MEASUREMENT
 
       // read measurements at this timestamp
       meas_package.sensor_type_ = MeasurementPackage::LASER;
       meas_package.raw_measurements_ = VectorXd(2);
-      float x;
-      float y;
-      iss >> x;
-      iss >> y;
-      meas_package.raw_measurements_ << x, y;
-      iss >> timestamp;
-      meas_package.timestamp_ = timestamp;
+      in_file >> meas_package.raw_measurements_(0);
+      in_file >> meas_package.raw_measurements_(1);
+      in_file >> meas_package.timestamp_;
+
       measurement_pack_list.push_back(meas_package);
-    } else if (sensor_type.compare("R") == 0) {
+    }
+    else if (sensor_type.compare("R") == 0) {
       // RADAR MEASUREMENT
 
       // read measurements at this timestamp
@@ -100,11 +91,11 @@ int main(int argc, char* argv[]) {
       float ro;
       float theta;
       float ro_dot;
-      iss >> ro;
-      iss >> theta;
-      iss >> ro_dot;
+      in_file >> ro;
+      in_file >> theta;
+      in_file >> ro_dot;
       meas_package.raw_measurements_ << ro, theta, ro_dot;
-      iss >> timestamp;
+      in_file >> timestamp;
       meas_package.timestamp_ = timestamp;
       measurement_pack_list.push_back(meas_package);
     }
@@ -114,10 +105,10 @@ int main(int argc, char* argv[]) {
     float y_gt;
     float vx_gt;
     float vy_gt;
-    iss >> x_gt;
-    iss >> y_gt;
-    iss >> vx_gt;
-    iss >> vy_gt;
+    in_file >> x_gt;
+    in_file >> y_gt;
+    in_file >> vx_gt;
+    in_file >> vy_gt;
     gt_pack_list.emplace_back(x_gt, y_gt, vx_gt, vy_gt);
   }
 
