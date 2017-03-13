@@ -1,28 +1,25 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
-#include <vector>
+
+#include "state.h"
+
 #include "Eigen/Dense"
 
-using Eigen::MatrixXd;
-using Eigen::VectorXd;
+#include <vector>
+
+namespace kalmon
+{
+
 using namespace std;
 
 class Tools {
 public:
   /**
-  * Constructor.
-  */
-  Tools();
-
-  /**
-  * Destructor.
-  */
-  virtual ~Tools();
-
-  /**
   * A helper method to calculate RMSE.
   */
-  VectorXd CalculateRMSE(const vector<VectorXd> &estimations, const vector<VectorXd> &ground_truth);
+  State CalculateRMSE(const vector<State> &estimations, const vector<State> &ground_truth);
 };
+
+} // namespace kalmon
 
 #endif /* TOOLS_H_ */

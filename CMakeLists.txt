@@ -4,10 +4,11 @@ project(ExtendedKF)
 
 add_definitions(-std=c++0x)
 
-set(sources
-    src/fusion_ekf.cpp
-    src/kalman_filter.cpp
-    src/main.cpp
-    src/tools.cpp)
-
-add_executable(ExtendedKF ${sources})
+add_executable(kalmon
+    "src/kalman_filter.cpp"
+    "src/main.cpp"
+    "src/measurement.cpp"
+    "src/settings.cpp"
+    "src/state.cpp"
+    "src/tools.cpp"
+)

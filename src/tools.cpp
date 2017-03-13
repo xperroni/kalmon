@@ -1,21 +1,19 @@
-#include <iostream>
 #include "tools.h"
 
-Tools::Tools() {}
+#include <iostream>
 
-Tools::~Tools() {}
+namespace kalmon
+{
 
-VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations, const vector<VectorXd> &ground_truth) {
-  VectorXd rmse(4);
-
-  rmse << 0, 0, 0, 0;
-  int n = estimations.size();
+State Tools::CalculateRMSE(const vector<State> &estimates, const vector<State> &ground_truth) {
+  int n = n = estimates.size();
+  State rmse;
   for(int i = 0; i < n; ++i) {
-    const VectorXd &a = estimations[i];
-    const VectorXd &b = ground_truth[i];
+    const State &a = estimates[i];
+    const State &b = ground_truth[i];
 
-    VectorXd c = a - b;
-    VectorXd d2 = c.array() * c.array();
+    State c = a - b;
+    State d2 = c.array() * c.array();
     rmse += d2;
   }
 
@@ -27,4 +25,6 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations, const vector<
 
   //return the result
   return rmse;
+}
+
 }
