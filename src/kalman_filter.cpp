@@ -37,7 +37,7 @@ State KalmanFilter::operator () (const Measurement &z) {
     x = z.x();
 
     // Initialize covariance matrix.
-    P = I * getSettings().s_P0;
+    P = I * getSettings().s2_P0;
 
     // Initialize timestamp.
     t_ = z.timestamp;
@@ -71,17 +71,17 @@ void KalmanFilter::predict(double dt) {
   double dt3 = dt * dt2;
   double dt4 = dt * dt3;
 
-  double nx = getSettings().s_Qx;
-  double ny = getSettings().s_Qy;
+  double s2_ax = getSettings().s2_ax;
+  double s2_ay = getSettings().s2_ay;
 
   // Update the process noise covariance matrix
   // according to the new elapsed time.
-  Q_(0, 0) = dt4 * nx * 0.25;
-  Q_(1, 1) = dt4 * ny * 0.25;
-  Q_(2, 2) = dt2 * nx;
-  Q_(3, 3) = dt2 * ny;
-  Q_(0, 2) = Q_(2, 0) = dt3 * nx * 0.5;
-  Q_(1, 3) = Q_(3, 1) = dt3 * ny * 0.5;
+  Q_(0, 0) = dt4 * s2_ax * 0.25;
+  Q_(1, 1) = dt4 * s2_ay * 0.25;
+  Q_(2, 2) = dt2 * s2_ax;
+  Q_(3, 3) = dt2 * s2_ay;
+  Q_(0, 2) = Q_(2, 0) = dt3 * s2_ax * 0.5;
+  Q_(1, 3) = Q_(3, 1) = dt3 * s2_ay * 0.5;
 
   x = F_ * x;
   P = F_ * P * Ft_ + Q_;

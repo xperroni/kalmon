@@ -42,13 +42,13 @@ public:
 };
 
 MatrixXd laserR() {
-  double sx = getSettings().s_px;
-  double sy = getSettings().s_py;
+  double s2_px = getSettings().s2_px;
+  double s2_py = getSettings().s2_py;
 
   MatrixXd R(2, 2);
   R <<
-    sx, 0,
-    0, sy;
+    s2_px, 0,
+    0, s2_py;
 
   return R;
 }
@@ -117,15 +117,15 @@ struct Radar: Sensor {
 };
 
 MatrixXd radarR() {
-  double sd = getSettings().s_d;
-  double sr = getSettings().s_r;
-  double sv = getSettings().s_v;
+  double s2_d = getSettings().s2_d;
+  double s2_r = getSettings().s2_r;
+  double s2_v = getSettings().s2_v;
 
   MatrixXd R(3, 3);
   R <<
-    sd, 0, 0,
-    0, sr, 0,
-    0, 0, sv;
+    s2_d, 0, 0,
+    0, s2_r, 0,
+    0, 0, s2_v;
 
   return R;
 }

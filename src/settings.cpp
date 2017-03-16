@@ -4,14 +4,14 @@ namespace kalmon
 {
 
 Settings::Settings():
-  s_P0(0.01),
-  s_Qx(10),
-  s_Qy(8),
-  s_px(0.0225),
-  s_py(0.02),
-  s_r(0.1),
-  s_d(0.1),
-  s_v(0.1)
+  s2_P0(0.01),
+  s2_ax(10),
+  s2_ay(8),
+  s2_px(0.0225),
+  s2_py(0.02),
+  s2_r(0.1),
+  s2_d(0.1),
+  s2_v(0.1)
 {
   // Nothing to do.
 }

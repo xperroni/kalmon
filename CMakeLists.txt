@@ -10,5 +10,4 @@ add_executable(kalmon
     "src/measurement.cpp"
     "src/settings.cpp"
     "src/state.cpp"
-    "src/tools.cpp"
 )

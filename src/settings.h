@@ -5,21 +5,21 @@ namespace kalmon
 {
 
 struct Settings {
-  double s_P0;
+  double s2_P0;
 
-  double s_Qx;
+  double s2_ax;
 
-  double s_Qy;
+  double s2_ay;
 
-  double s_px;
+  double s2_px;
 
-  double s_py;
+  double s2_py;
 
-  double s_d;
+  double s2_d;
 
-  double s_r;
+  double s2_r;
 
-  double s_v;
+  double s2_v;
 
   Settings();
 };

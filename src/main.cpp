@@ -1,7 +1,6 @@
 #include "kalman_filter.h"
 #include "measurement.h"
 #include "state.h"
-#include "tools.h"
 
 #include "Eigen/Dense"
 
@@ -95,8 +94,7 @@ int main(int argc, char* argv[]) {
   }
 
   // compute the accuracy (RMSE)
-  Tools tools;
-  cout << "Accuracy - RMSE:" << endl << fixed << setprecision(2) << tools.CalculateRMSE(estimates, ground_truth) << endl;
+  cout << "Accuracy - RMSE:" << endl << fixed << setprecision(2) << RMSE(estimates, ground_truth) << endl;
 
   // close files
   out_file.close();
