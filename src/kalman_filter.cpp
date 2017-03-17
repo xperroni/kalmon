@@ -34,19 +34,19 @@ State KalmanFilter::operator () (const Measurement &z) {
     Ft_ = F_.transpose();
 
     // Initialize state with first measurement.
-    x = z.x();
+    x = z->x();
 
     // Initialize covariance matrix.
     P = I * getSettings().s2_P0;
 
     // Initialize timestamp.
-    t_ = z.timestamp;
+    t_ = z->timestamp;
 
     return x;
   }
 
   // Compute elapsed time in seconds.
-  double t = z.timestamp;
+  double t = z->timestamp;
   double dt = (t - t_) / 1000000.0;
 
   // Predict new state.
@@ -87,12 +87,12 @@ void KalmanFilter::predict(double dt) {
   P = F_ * P * Ft_ + Q_;
 }
 
-void KalmanFilter::update(const Measurement &z) {
-  MatrixXd H = z.H(x);
+void KalmanFilter::update(const Measurement z) {
+  MatrixXd H = z->H(x);
   MatrixXd Ht = H.transpose();
 
-  VectorXd y = z - H * x;
-  MatrixXd S = H * P * Ht + z.R;
+  VectorXd y = *z - H * x;
+  MatrixXd S = H * P * Ht + z->R();
   MatrixXd K = P * Ht * S.inverse();
 
   x += K * y;

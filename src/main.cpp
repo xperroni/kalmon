@@ -1,5 +1,5 @@
 #include "kalman_filter.h"
-#include "measurement.h"
+#include "sensors.h"
 #include "state.h"
 
 #include "Eigen/Dense"
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
 
   //Call the EKF-based fusion
   for (size_t k = 0, n = measurements.size(); k < n; ++k) {
-    Measurement &z = measurements[k];
+    Measurement z = measurements[k];
     State &g = ground_truth[k];
 
     // start filtering from the second frame (the speed is unknown in the first

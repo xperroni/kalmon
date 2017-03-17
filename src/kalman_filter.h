@@ -1,7 +1,7 @@
 #ifndef KALMON_KALMAN_FILTER_H
 #define KALMON_KALMAN_FILTER_H
 
-#include "measurement.h"
+#include "sensors.h"
 #include "state.h"
 
 namespace kalmon
@@ -34,7 +34,7 @@ class KalmanFilter {
    * Updates the state and
    * @param z The measurement at k+1
    */
-  void update(const Measurement &z);
+  void update(const Measurement z);
 
 public:
   // state vector

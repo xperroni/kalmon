@@ -7,7 +7,7 @@ add_definitions(-std=c++0x)
 add_executable(kalmon
     "src/kalman_filter.cpp"
     "src/main.cpp"
-    "src/measurement.cpp"
+    "src/sensors.cpp"
     "src/settings.cpp"
     "src/state.cpp"
 )
