@@ -29,10 +29,18 @@ namespace kalmon {
 static const MatrixXd I = MatrixXd::Identity(4, 4);
 
 KalmanFilter::KalmanFilter():
-  F_(0, 0),
-  Q_(MatrixXd(4, 4)),
-  P(MatrixXd(4, 4))
+  F_(4, 4),
+  Q_(4, 4),
+  P(0, 0)
 {
+  F_ <<
+    1, 0, 1, 0,
+    0, 1, 0, 1,
+    0, 0, 1, 0,
+    0, 0, 0, 1;
+
+  Ft_ = F_.transpose();
+
   Q_ <<
     0, 0, 0, 0,
     0, 0, 0, 0,
@@ -41,21 +49,12 @@ KalmanFilter::KalmanFilter():
 }
 
 State KalmanFilter::operator () (const Measurement z) {
-  if (F_.rows() == 0) {
-    // Initialize state transition matrix.
-    F_.resize(4, 4);
-    F_ <<
-      1, 0, 1, 0,
-      0, 1, 0, 1,
-      0, 0, 1, 0,
-      0, 0, 0, 1;
-
-    Ft_ = F_.transpose();
-
+  if (P.rows() == 0) {
     // Initialize state with first measurement.
     x = z->x();
 
     // Initialize covariance matrix.
+    P.resize(4, 4);
     P = I * getSettings().s2_P0;
 
     // Initialize timestamp.
