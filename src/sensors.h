@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) Helio Perroni Filho <xperroni@gmail.com>
+ *
+ * This file is part of KalmOn.
+ *
+ * KalmOn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * KalmOn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with KalmOn. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef KALMON_SENSORS_H
 #define KALMON_SENSORS_H
 
@@ -6,8 +25,7 @@
 #include <iostream>
 #include <memory>
 
-namespace kalmon
-{
+namespace kalmon {
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -19,17 +37,7 @@ using std::shared_ptr;
 /**
  * @brief The sensor array used to retrieve location measurements.
  */
-class Sensors {
-  /** @brief Laser measurement model matrix. */
-  MatrixXd laserH_;
-
-  /** @brief Laser measurement covariance matrix. */
-  MatrixXd laserR_;
-
-  /** @brief Radar measurement covariance matrix. */
-  MatrixXd radarR_;
-
-public:
+struct Sensors {
   /**
    * @brief A measurement retrieved from one of the sensors in the array.
    */
@@ -67,6 +75,16 @@ public:
    * @brief Return a new sensor measurement from the given input stream.
    */
   Measurement *operator () (istream &data) const;
+
+private:
+  /** @brief Laser measurement model matrix. */
+  MatrixXd laserH_;
+
+  /** @brief Laser measurement covariance matrix. */
+  MatrixXd laserR_;
+
+  /** @brief Radar measurement covariance matrix. */
+  MatrixXd radarR_;
 };
 
 /**

@@ -1,22 +1,38 @@
-#include "kalman_filter.h"
-#include "sensors.h"
-#include "state.h"
+/*
+ * Copyright (c) Helio Perroni Filho <xperroni@gmail.com>
+ *
+ * This file is part of KalmOn.
+ *
+ * KalmOn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * KalmOn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with KalmOn. If not, see <http://www.gnu.org/licenses/>.
+ */
 
-#include "Eigen/Dense"
+#include "kalman_filter.h"
 
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 #include <sstream>
 #include <vector>
-#include <stdlib.h>
 
 using namespace kalmon;
 
 using namespace std;
 
+/**
+ * @brief Make sure user has provided input and output files.
+ */
 void check_arguments(int argc, char* argv[]) {
-  // Make sure user has provided input and output files.
   if (argc == 2) {
     cerr << "Please include an output file." << endl;
   }
@@ -30,6 +46,9 @@ void check_arguments(int argc, char* argv[]) {
   }
 }
 
+/**
+ * @brief Try to open given file, quit program if unsuccessful.
+ */
 template<class T> void open(T &file, const char *path) {
   file.open(path);
   if (!file.is_open()) {
@@ -38,33 +57,31 @@ template<class T> void open(T &file, const char *path) {
   }
 }
 
+/**
+ * @brief Run program.
+ */
 int main(int argc, char* argv[]) {
-  // Confirm arguments are correct, quits otherwise.
   check_arguments(argc, argv);
 
-  ifstream in_file;
-  open(in_file, argv[1]);
+  ifstream data;
+  open(data, argv[1]);
 
-  ofstream out_file;
-  open(out_file, argv[2]);
+  ofstream out;
+  open(out, argv[2]);
 
   vector<Measurement> measurements;
   vector<State> ground_truth;
 
-  // prep the measurement packages (each line represents a measurement at a
-  // timestamp)
+  // Read input measurements and ground truth.
   for (;;) {
     Measurement z;
     State g;
 
-    // Read measurement and ground truth from file stream.
-    in_file >> z >> g;
-    if (in_file.eof())
+    data >> z >> g;
+    if (data.eof())
       break;
 
     measurements.push_back(z);
-
-    // Read ground truth data to compare later.
     ground_truth.push_back(g);
   }
 
@@ -74,31 +91,25 @@ int main(int argc, char* argv[]) {
   // State estimates.
   vector<State> estimates;
 
-  //Call the EKF-based fusion
+  // Produce state estimates for loaded measurements and
+  // record them along ground truth values.
   for (size_t k = 0, n = measurements.size(); k < n; ++k) {
     Measurement z = measurements[k];
-    State &g = ground_truth[k];
-
-    // start filtering from the second frame (the speed is unknown in the first
-    // frame)
     State x = filter(z);
 
     cerr << "x:" << endl << filter.x << endl;
     cerr << "P:" << endl << filter.P << endl;
 
-
-    // Output estimate, measurement and ground truth.
-    out_file << x << '\t' << z << '\t' << g << endl;
+    out << x << '\t' << z << '\t' << ground_truth[k] << endl;
 
     estimates.push_back(x);
   }
 
-  // compute the accuracy (RMSE)
-  cout << "Accuracy - RMSE:" << endl << fixed << setprecision(2) << RMSE(estimates, ground_truth) << endl;
+  // Compute overall estimate accuracy using Root Mean Squared Error (RMSE).
+  cerr << "Accuracy - RMSE:" << endl << fixed << setprecision(2) << RMSE(estimates, ground_truth) << endl;
 
-  // close files
-  out_file.close();
-  in_file.close();
+  out.close();
+  data.close();
 
   return 0;
 }

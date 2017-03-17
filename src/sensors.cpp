@@ -1,23 +1,34 @@
+/*
+ * Copyright (c) Helio Perroni Filho <xperroni@gmail.com>
+ *
+ * This file is part of KalmOn.
+ *
+ * KalmOn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * KalmOn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with KalmOn. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "sensors.h"
 
 #include "settings.h"
 
 using std::string;
 
-namespace kalmon
-{
+namespace kalmon {
 
 /**
  * @brief A measurement retrieved from the laser sensor.
  */
-class MeasurementLaser: public Sensors::Measurement {
-  /** @brief Model matrix for this measurement. */
-  const MatrixXd &H_;
-
-  /** @brief Covariance matrix for this measurement. */
-  const MatrixXd &R_;
-
-public:
+struct MeasurementLaser: Sensors::Measurement {
   /**
    * @brief Retrieve a new laser measurement from the given input stream.
    */
@@ -47,16 +58,19 @@ public:
   virtual MatrixXd R() const {
     return R_;
   }
+
+private:
+  /** @brief Model matrix for this measurement. */
+  const MatrixXd &H_;
+
+  /** @brief Covariance matrix for this measurement. */
+  const MatrixXd &R_;
 };
 
 /**
  * @brief A measurement retrieved from the radar sensor.
  */
-class MeasurementRadar: public Sensors::Measurement {
-  /** @brief Covariance matrix for this measurement. */
-  const MatrixXd &R_;
-
-public:
+struct MeasurementRadar: Sensors::Measurement {
   /**
    * @brief Retrieve a new radar measurement from the given input stream.
    */
@@ -94,24 +108,22 @@ public:
         0, 0, 0, 0,
         0, 0, 0, 0;
 
-    //recover state parameters
     float px = x(0);
     float py = x(1);
     float vx = x(2);
     float vy = x(3);
 
-    //check division by zero
     if (px == 0 && py == 0) {
         return H;
     }
 
-    //compute the Jacobian matrix
     float px2 = px * px;
     float py2 = py * py;
     float d2 = px2 + py2;
     float d = ::sqrt(d2);
     float d3 = d2 * d;
 
+    // Compute the Jacobian matrix of the state.
     H(0, 0) = px / d;
     H(0, 1) = py / d;
     H(1, 0) = -py / d2;
@@ -127,6 +139,10 @@ public:
   virtual MatrixXd R() const {
     return R_;
   }
+
+private:
+  /** @brief Covariance matrix for this measurement. */
+  const MatrixXd &R_;
 };
 
 Sensors::Sensors():
@@ -155,10 +171,10 @@ Sensors::Sensors():
 }
 
 Sensors::Measurement *Sensors::operator () (istream &data) const {
-    string sensor_type;
-    data >> sensor_type;
+    string sensor;
+    data >> sensor;
 
-    if (sensor_type == "L") {
+    if (sensor == "L") {
       return new MeasurementLaser(data, laserH_, laserR_);
     }
     else /* if (sensor_type == "R") */ {

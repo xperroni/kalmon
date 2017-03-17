@@ -1,11 +1,29 @@
+/*
+ * Copyright (c) Helio Perroni Filho <xperroni@gmail.com>
+ *
+ * This file is part of KalmOn.
+ *
+ * KalmOn is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * KalmOn is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with KalmOn. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "kalman_filter.h"
 
 #include "settings.h"
 
 using namespace std;
 
-namespace kalmon
-{
+namespace kalmon {
 
 // identity matrix
 static const MatrixXd I = MatrixXd::Identity(4, 4);
@@ -22,8 +40,9 @@ KalmanFilter::KalmanFilter():
     0, 0, 0, 0;
 }
 
-State KalmanFilter::operator () (const Measurement &z) {
+State KalmanFilter::operator () (const Measurement z) {
   if (F_.rows() == 0) {
+    // Initialize state transition matrix.
     F_.resize(4, 4);
     F_ <<
       1, 0, 1, 0,
@@ -83,11 +102,13 @@ void KalmanFilter::predict(double dt) {
   Q_(0, 2) = Q_(2, 0) = dt3 * s2_ax * 0.5;
   Q_(1, 3) = Q_(3, 1) = dt3 * s2_ay * 0.5;
 
+  // Estimate next state and covariance matrix.
   x = F_ * x;
   P = F_ * P * Ft_ + Q_;
 }
 
 void KalmanFilter::update(const Measurement z) {
+  // Retrieve the measurement model matrix.
   MatrixXd H = z->H(x);
   MatrixXd Ht = H.transpose();
 
@@ -95,8 +116,9 @@ void KalmanFilter::update(const Measurement z) {
   MatrixXd S = H * P * Ht + z->R();
   MatrixXd K = P * Ht * S.inverse();
 
+  // Update next state and covariance matrix.
   x += K * y;
   P = (I - K * H) * P;
 }
 
-}
+} // namespace kalmon
